@@ -71,6 +71,7 @@ class BlankFragment(private val plugin: ExamplePlugin) : BottomSheetDialogFragme
         val imageView2: ImageView? = view.findViewByName("imageView2")
         val textView: TextView? = view.findViewByName("textView")
         val textView2: TextView? = view.findViewByName("textView2")
+        
 
         // Set text and styling if the views are found
         textView?.apply {
