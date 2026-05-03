@@ -1,9 +1,9 @@
 [
     {
-        "fileHash": "sha256-42e6ddf31443002f6475a72c128785c5aa2be820ad80a2c7d1c4fbfeafaffced",
+        "fileHash": "sha256-816ad91313ac5c8844af871b0e9b849ac3103b9109c45bc018367ea51cd33e5a",
         "apiVersion": 1,
         "repositoryUrl": "https://github.com/mpshimul/TestPlugins",
-        "fileSize": 13717,
+        "fileSize": 14485,
         "status": 1,
         "language": "en",
         "authors": [
@@ -13,7 +13,7 @@
             "Movie",
             "TvSeries"
         ],
-        "version": 3,
+        "version": 4,
         "internalName": "ExampleProvider",
         "description": "Stream movies from DhakaMovie BDIX",
         "url": "https://raw.githubusercontent.com/mpshimul/TestPlugins/builds/ExampleProvider.cs3",
