@@ -1,8 +1,0 @@
-{
-  "name": "My BDIX Repo",
-  "description": "BDIX provider for local content",
-  "manifestVersion": 1,
-  "pluginLists": [
-    "https://raw.githubusercontent.com/mpshimul/TestPlugins/builds/plugins.json"
-  ]
-}
