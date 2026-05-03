@@ -18,17 +18,20 @@ jobs:
         uses: actions/checkout@master
         with:
           path: "src"
+          fetch-depth: 0  # Needed to work with branches
 
-      - name: Create builds branch if it doesn't exist
+      - name: Create builds branch if missing (inside src repo)
         run: |
+          cd $GITHUB_WORKSPACE/src
           git ls-remote --heads origin builds || git checkout --orphan builds
-          git push origin builds || true
+          git push origin builds --force || true
 
-      - name: Checkout builds branch
-        uses: actions/checkout@master
-        with:
-          ref: "builds"
-          path: "builds"
+      - name: Checkout builds branch into separate folder
+        run: |
+          cd $GITHUB_WORKSPACE
+          git clone --branch builds --depth 1 https://github.com/${{ github.repository }} builds 2>/dev/null || git clone --depth 1 https://github.com/${{ github.repository }} builds
+          cd builds
+          git checkout builds 2>/dev/null || git checkout --orphan builds
 
       - name: Wipe builds branch clean
         run: |
@@ -49,7 +52,6 @@ jobs:
           cd $GITHUB_WORKSPACE/src
           chmod +x gradlew
           ./gradlew make makePluginsJson
-          # Copy built artifacts to the builds directory
           cp **/build/*.cs3 $GITHUB_WORKSPACE/builds 2>/dev/null || true
           cp build/plugins.json $GITHUB_WORKSPACE/builds
 
