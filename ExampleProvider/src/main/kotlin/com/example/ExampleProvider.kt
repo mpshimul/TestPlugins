@@ -50,7 +50,6 @@ class ExampleProvider : MainAPI() {
         val newReleases = fetchMovieList("$apiBaseUrl/new-releases")
         if (newReleases.isNotEmpty()) homePageLists.add(HomePageList("New Releases", newReleases))
 
-        // South Indian - using correct base URL
         val southIndianUrl = "$advancedSearchBase?query=&type=movies&page=1&per_page=28&category=South%20Indian&order_by=Latest"
         val southIndian = fetchMovieList(southIndianUrl)
         if (southIndian.isNotEmpty()) homePageLists.add(HomePageList("South Indian", southIndian))
@@ -68,24 +67,31 @@ class ExampleProvider : MainAPI() {
         return try {
             val response = app.get(url, headers = headers).text
             val json = mapper.readValue<Map<String, Any>>(response)
-            val movies = json["data"] as? List<Map<String, Any>> ?: return emptyList()
+
+            // Detect if it's advanced-search or normal API
+            val movies = if (json.containsKey("results")) {
+                val results = json["results"] as? Map<String, Any>
+                val moviesObj = results?.get("movies") as? Map<String, Any>
+                moviesObj?.get("data") as? List<Map<String, Any>> ?: emptyList()
+            } else {
+                json["data"] as? List<Map<String, Any>> ?: emptyList()
+            }
 
             movies.mapNotNull { movie ->
                 val slug = movie["slug"] as? String ?: return@mapNotNull null
                 val title = movie["title"] as? String ?: return@mapNotNull null
-                val poster = movie["poster_url"] as? String ?: ""
+                val poster = movie["poster_url"] as? String ?: movie["image"] as? String ?: ""
                 val year = (movie["year"] as? String)?.toIntOrNull()
                 val streamUrl = movie["stream_url"] as? String ?: ""
-                val backdrop = movie["backdrop_url"] as? String ?: ""
-                val plot = movie["overview"] as? String ?: ""
+                val backdrop = movie["backdrop_url"] as? String ?: poster
+                val plot = movie["overview"] as? String ?: "No plot available"
                 val rating = (movie["rating"] as? String)?.toDoubleOrNull()
                 val duration = (movie["runtime"] as? String)?.toIntOrNull()
-                val director = movie["director"] as? String ?: ""
+                val director = movie["director"] as? String ?: "Unknown"
                 val genresStr = movie["genres"] as? String ?: ""
                 val genres = genresStr.split(",").map { it.trim() }.filter { it.isNotEmpty() }
 
                 val movieUrl = "$mainUrl/movies/$slug"
-
                 movieStore[movieUrl] = MovieData(
                     slug, title, streamUrl, poster, backdrop, plot,
                     year, rating, duration, director, genres
@@ -127,11 +133,11 @@ class ExampleProvider : MainAPI() {
             val poster = movie["poster_url"] as? String ?: ""
             val year = (movie["year"] as? String)?.toIntOrNull()
             val streamUrl = movie["stream_url"] as? String ?: ""
-            val backdrop = movie["backdrop_url"] as? String ?: ""
-            val plot = movie["overview"] as? String ?: ""
+            val backdrop = movie["backdrop_url"] as? String ?: poster
+            val plot = movie["overview"] as? String ?: "No plot available"
             val rating = (movie["rating"] as? String)?.toDoubleOrNull()
             val duration = (movie["runtime"] as? String)?.toIntOrNull()
-            val director = movie["director"] as? String ?: ""
+            val director = movie["director"] as? String ?: "Unknown"
             val genresStr = movie["genres"] as? String ?: ""
             val genres = genresStr.split(",").map { it.trim() }.filter { it.isNotEmpty() }
 
