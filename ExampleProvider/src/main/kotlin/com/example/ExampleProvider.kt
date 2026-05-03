@@ -167,14 +167,16 @@ class ExampleProvider : MainAPI() {
                     val seasonNumber = seasonRaw["season_number"] as? Int ?: continue
                     val episodesRaw = seasonRaw["episodes"] as? List<Map<String, Any>> ?: continue
                     val episodes = episodesRaw.mapNotNull { ep ->
-                        val epNum = ep["episode_number"] as? Int ?: return@mapNotNull null
-                        val epTitle = ep["title"] as? String ?: "Episode $epNum"
-                        val fileUrl = ep["file_url"] as? String ?: return@mapNotNull null
-                        val runtime = (ep["property"] as? Map<String, Any>)?.get("runtime") as? Int
-                        val epPoster = ep["poster_url"] as? String ?: ""
-                        val fullEpPoster = if (epPoster.startsWith("/")) "$mainUrl:8080$epPoster" else epPoster
-                        EpisodeData(epTitle, epNum, fileUrl, runtime, fullEpPoster)
-                    }
+    val epNum = ep["episode_number"] as? Int ?: return@mapNotNull null
+    val epTitle = ep["title"] as? String ?: "Episode $epNum"
+    val fileUrl = ep["file_url"] as? String ?: return@mapNotNull null
+    // 👇 Remove the "server1/" prefix if it exists
+    val cleanedFileUrl = fileUrl.removePrefix("server1/")
+    val runtime = (ep["property"] as? Map<String, Any>)?.get("runtime") as? Int
+    val epPoster = ep["poster_url"] as? String ?: ""
+    val fullEpPoster = if (epPoster.startsWith("/")) "$mainUrl:8080$epPoster" else epPoster
+    EpisodeData(epTitle, epNum, cleanedFileUrl, runtime, fullEpPoster)
+}
                     if (episodes.isNotEmpty()) {
                         seasonsList.add(SeasonData(seasonNumber, episodes))
                     }
