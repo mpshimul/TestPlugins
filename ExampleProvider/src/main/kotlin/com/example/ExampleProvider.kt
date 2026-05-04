@@ -69,49 +69,36 @@ class ExampleProvider : MainAPI() {
         "Referer" to mainUrl
     )
 
-    // ------------------------------------------------------------
-    // Main page
-    // ------------------------------------------------------------
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
         val lists = mutableListOf<HomePageList>()
 
-        // Movies (advanced search, 1000 items)
         val allMoviesUrl = "$advancedSearchBase?query=&type=movies&page=1&per_page=1000&order_by=Latest"
         val allMovies = fetchMovieList(allMoviesUrl)
         if (allMovies.isNotEmpty()) lists.add(HomePageList("All Movies (1000+)", allMovies))
 
-        // TV Series (advanced search, 1000 items)
         val tvSeriesUrl = "$advancedSearchBase?query=&type=tv_series&page=1&per_page=1000&order_by=Latest"
         val tvSeriesBasic = fetchSeriesBasicList(tvSeriesUrl)
         if (tvSeriesBasic.isNotEmpty()) lists.add(HomePageList("TV Series (1000+)", tvSeriesBasic))
 
-        // Latest Movies
         val latest = fetchMovieList("$apiMoviesBase/latest")
         if (latest.isNotEmpty()) lists.add(HomePageList("Latest Movies", latest))
 
-        // New Releases
         val newReleases = fetchMovieList("$apiMoviesBase/new-releases")
         if (newReleases.isNotEmpty()) lists.add(HomePageList("New Releases", newReleases))
 
-        // South Indian (advanced search, 1000 items)
         val southIndianUrl = "$advancedSearchBase?query=&type=movies&page=1&per_page=1000&category=South%20Indian&order_by=Latest"
         val southIndian = fetchMovieList(southIndianUrl)
         if (southIndian.isNotEmpty()) lists.add(HomePageList("South Indian (1000+)", southIndian))
 
-        // Trending
         val trending = fetchMovieList("$apiMoviesBase/trending")
         if (trending.isNotEmpty()) lists.add(HomePageList("Trending", trending))
 
-        // Top 10
         val top10 = fetchMovieList("$apiMoviesBase/top-10")
         if (top10.isNotEmpty()) lists.add(HomePageList("Top 10", top10))
 
         return newHomePageResponse(lists)
     }
 
-    // ------------------------------------------------------------
-    // Fetch movies (advanced search or regular)
-    // ------------------------------------------------------------
     private suspend fun fetchMovieList(baseUrl: String): List<SearchResponse> {
         return try {
             val response = app.get(baseUrl, headers = headers).text
@@ -140,13 +127,15 @@ class ExampleProvider : MainAPI() {
                 val genresStr = movie["genres"] as? String ?: ""
                 val genres = genresStr.split(",").map { it.trim() }.filter { it.isNotEmpty() }
 
-                val movieUrl = "$mainUrl/movies/$slug"
-                movieStore[movieUrl] = MovieData(
+                // IMPORTANT: Use the detail page URL, NOT the stream URL
+                val movieDetailUrl = "$mainUrl/movies/$slug"
+
+                movieStore[movieDetailUrl] = MovieData(
                     slug, title, streamUrl, fullPoster, backdrop, plot,
                     year, rating, duration, director, genres
                 )
 
-                newMovieSearchResponse(title, movieUrl, TvType.Movie, false) {
+                newMovieSearchResponse(title, movieDetailUrl, TvType.Movie, false) {
                     this.posterUrl = fullPoster
                     this.year = year
                 }
@@ -156,9 +145,6 @@ class ExampleProvider : MainAPI() {
         }
     }
 
-    // ------------------------------------------------------------
-    // Fetch TV series basic info (from advanced search)
-    // ------------------------------------------------------------
     private suspend fun fetchSeriesBasicList(baseUrl: String): List<SearchResponse> {
         return try {
             val response = app.get(baseUrl, headers = headers).text
@@ -174,7 +160,9 @@ class ExampleProvider : MainAPI() {
                 val fullPoster = if (poster.startsWith("/")) "$mainUrl:8080$poster" else poster
                 val year = (series["year"] as? String)?.toIntOrNull()
 
-                newTvSeriesSearchResponse(title, "series://$slug", TvType.TvSeries) {
+                // Use a custom scheme that CloudStream won't modify
+                val seriesUrl = "tvseries:$slug"
+                newTvSeriesSearchResponse(title, seriesUrl, TvType.TvSeries) {
                     this.posterUrl = fullPoster
                     this.year = year
                 }
@@ -184,9 +172,6 @@ class ExampleProvider : MainAPI() {
         }
     }
 
-    // ------------------------------------------------------------
-    // Fetch full TV series details (using slug endpoint)
-    // ------------------------------------------------------------
     private suspend fun fetchFullSeries(slug: String): SeriesData? {
         val url = "$mainUrl/tv-series/$slug"
         return try {
@@ -235,9 +220,6 @@ class ExampleProvider : MainAPI() {
         }
     }
 
-    // ------------------------------------------------------------
-    // Search (movies only)
-    // ------------------------------------------------------------
     override suspend fun search(query: String): List<SearchResponse> {
         val allMovies = mutableListOf<Map<String, Any>>()
         for (page in 1..2) {
@@ -287,13 +269,10 @@ class ExampleProvider : MainAPI() {
         }
     }
 
-    // ------------------------------------------------------------
-    // Load details (movie or series)
-    // ------------------------------------------------------------
     override suspend fun load(url: String): LoadResponse {
-        // TV series
-        if (url.startsWith("series://")) {
-            val slug = url.removePrefix("series://")
+        // TV series - check for custom scheme
+        if (url.startsWith("tvseries:")) {
+            val slug = url.removePrefix("tvseries:")
             val series = fetchFullSeries(slug) ?: throw Error("Could not fetch series details")
             val seriesUrl = "$mainUrl/tv/${series.slug}"
             seriesStore[seriesUrl] = series
@@ -320,8 +299,6 @@ class ExampleProvider : MainAPI() {
                 this.year = series.year
                 this.posterUrl = series.poster
                 this.backgroundPosterUrl = series.backdrop
-                // Score requires a Score object; omit to avoid type error
-                // this.score = Score.from(series.rating, 10) // uncomment if available
                 if (series.genres.isNotEmpty()) this.tags = series.genres
             }
         }
@@ -345,9 +322,6 @@ class ExampleProvider : MainAPI() {
         throw Error("Unknown URL type: $url")
     }
 
-    // ------------------------------------------------------------
-    // Extract video links (movies or episodes)
-    // ------------------------------------------------------------
     override suspend fun loadLinks(
         data: String,
         isCasting: Boolean,
