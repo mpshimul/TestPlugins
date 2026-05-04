@@ -1,9 +1,9 @@
 [
     {
-        "fileHash": "sha256-3fdc839a95ef812eca62b204920f4a58c7f5d02026a1696d5c5e8c02ee1ff779",
+        "fileHash": "sha256-eba12c7b62571070a38627bf59cd2e13a6e1b13015f539032a019834c5b2064f",
         "apiVersion": 1,
         "repositoryUrl": "https://github.com/mpshimul/TestPlugins",
-        "fileSize": 27213,
+        "fileSize": 27099,
         "status": 1,
         "language": "en",
         "authors": [
