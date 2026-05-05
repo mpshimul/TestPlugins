@@ -14,7 +14,9 @@ CloudStream extension for **DhakaMovie** – a BDIX movie and TV series streamin
 
 ## 📦 Installation
 
-[![Install](https://img.shields.io/badge/Install-Directly_into_CloudStream-1f425f.svg)](https://mpshimul.github.io/bdix-cloudstream-extensions/install.html)
+- **One-Click Install (Recommended)**: [![Install Repository](https://img.shields.io/badge/Install-Repository-1f425f.svg)](cloudstreamrepo://raw.githubusercontent.com/mpshimul/bdix-cloudstream-extensions/master/repo.json)
+
+[![Install from webpage](https://img.shields.io/badge/Install-Directly_into_CloudStream-1f425f.svg)](https://mpshimul.github.io/bdix-cloudstream-extensions/install.html)
 
 1. **Add repository to CloudStream**  
    Open CloudStream → **Settings** → **Extensions** → **Add Repository**  
