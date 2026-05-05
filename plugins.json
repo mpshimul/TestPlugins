@@ -1,9 +1,9 @@
 [
     {
-        "fileHash": "sha256-68bad4cd63b2aaa11b336113c731860c86df8dea0e07a967e7c8f34f658251f4",
+        "fileHash": "sha256-59c31f8cf36f72512ce019a98a5ab5a7eff326de80ff8c28e244e7adacfa73cc",
         "apiVersion": 1,
         "repositoryUrl": "https://github.com/mpshimul/bdix-cloudstream-extensions",
-        "fileSize": 21956,
+        "fileSize": 21961,
         "status": 1,
         "language": "en",
         "authors": [
@@ -13,7 +13,7 @@
             "Movie",
             "TvSeries"
         ],
-        "version": 8,
+        "version": 9,
         "internalName": "DhakaMovieProvider",
         "description": "Stream movies from DhakaMovie BDIX",
         "url": "https://raw.githubusercontent.com/mpshimul/bdix-cloudstream-extensions/builds/DhakaMovieProvider.cs3",
