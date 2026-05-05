@@ -2,7 +2,7 @@
     {
         "fileHash": "sha256-3e9d24802572c89ecc11602431b99e6c699af50db60b14a4b799d4cffd1ba9b2",
         "apiVersion": 1,
-        "repositoryUrl": "https://github.com/mpshimul/TestPlugins",
+        "repositoryUrl": "https://github.com/mpshimul/bdix-cloudstream-extensions",
         "fileSize": 24296,
         "status": 1,
         "language": "en",
@@ -16,7 +16,7 @@
         "version": 7,
         "internalName": "ExampleProvider",
         "description": "Stream movies from DhakaMovie BDIX",
-        "url": "https://raw.githubusercontent.com/mpshimul/TestPlugins/builds/ExampleProvider.cs3",
+        "url": "https://raw.githubusercontent.com/mpshimul/bdix-cloudstream-extensions/builds/ExampleProvider.cs3",
         "name": "ExampleProvider"
     }
 ]
