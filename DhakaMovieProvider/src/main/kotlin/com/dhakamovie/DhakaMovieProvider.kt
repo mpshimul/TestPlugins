@@ -71,8 +71,8 @@ class DhakaMovieProvider : MainAPI() {
 
         val seriesRows = listOf(
             "TV Series (Latest)" to "$advancedSearchBase?query=&type=tv_series&page=1&per_page=700&order_by=Latest",
-            "Most Popular TV Series" to "$advancedSearchBase?query=&type=tv_series&page=1&per_page=700&category=Most+Popular&order_by=Latest",
-            "Trending TV Series" to "$advancedSearchBase?query=&type=tv_series&page=1&per_page=700&category=Trending&order_by=Latest",
+            "Most Popular TV Series" to "$advancedSearchBase?query=&type=tv_series&page=1&per_page=700&views=Most+Popular&order_by=Latest",
+            "Trending TV Series" to "$advancedSearchBase?query=&type=tv_series&page=1&per_page=700&views=Trending&order_by=Latest",
             "Korean TV Series" to "$advancedSearchBase?query=&type=tv_series&page=1&per_page=700&category=Korean&order_by=Latest",
             "NetFlix TV Series" to "$advancedSearchBase?query=&type=tv_series&page=1&per_page=700&category=Netflix&order_by=Latest",
             "Prime TV Series" to "$advancedSearchBase?query=&type=tv_series&page=1&per_page=700&category=Prime&order_by=Latest",
