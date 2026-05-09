@@ -16,7 +16,7 @@ cloudstream {
 }
 
 android {
-    namespace = "com.fmftp"               // Required for AGP 8.0+
+    namespace = "com.fmftp"
     compileSdk = 35
     defaultConfig {
         minSdk = 21
@@ -33,7 +33,6 @@ android {
 }
 
 dependencies {
-    // Dependencies are inherited from root, but explicit is fine
     implementation("com.github.Blatzar:NiceHttp:0.4.11")
     implementation("org.jsoup:jsoup:1.18.3")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.1")
