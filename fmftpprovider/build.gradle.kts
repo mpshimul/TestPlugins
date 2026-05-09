@@ -1,5 +1,3 @@
-version = 1
-
 plugins {
     id("com.android.library")
     id("kotlin-android")
@@ -19,10 +17,18 @@ cloudstream {
 
 android {
     namespace = "com.fmftp"
-    // No compileOptions or kotlinOptions needed here – they are inherited from the root
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = "1.8"
+        freeCompilerArgs = freeCompilerArgs + "-Xskip-metadata-version-check"
+    }
 }
 
 dependencies {
+    // Dependencies are inherited from root, but explicit is fine
     implementation("com.github.Blatzar:NiceHttp:0.4.11")
     implementation("org.jsoup:jsoup:1.18.3")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.1")

@@ -18,14 +18,12 @@ class FmftpProvider : MainAPI() {
 
     companion object {
         val movieStore = mutableMapOf<String, MovieData>()
-        val libraryMap = mutableMapOf<String, String>()
     }
 
     data class MovieData(
         val title: String,
         val streamUrl: String,
         val poster: String,
-        val backdrop: String,
         val plot: String,
         val year: Int?,
         val rating: Double?,
@@ -39,34 +37,18 @@ class FmftpProvider : MainAPI() {
     )
 
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
-        val allMovies = fetchAllMovies()
-        if (allMovies.isEmpty()) return newHomePageResponse(emptyList())
+        val all = fetchMovies()
+        if (all.isEmpty()) return newHomePageResponse(emptyList())
 
-        val grouped = mutableMapOf<String, MutableList<SearchResponse>>()
-        val latest = mutableListOf<SearchResponse>()
-
-        for ((detailUrl, searchResp) in allMovies) {
-            val lib = libraryMap[detailUrl] ?: "Unknown"
-            grouped.getOrPut(lib) { mutableListOf() }.add(searchResp)
-            if (latest.size < 30) latest.add(searchResp)
-        }
-
-        val lists = mutableListOf<HomePageList>()
-        if (latest.isNotEmpty()) lists.add(HomePageList("Latest Movies", latest))
-
-        val order = listOf("Hollywood", "Bollywood", "Hindi dubbed", "Indian Bangla")
-        for (cat in order) {
-            grouped[cat]?.let { lists.add(HomePageList("$cat Movies", it)) }
-        }
-
-        return newHomePageResponse(lists)
+        val latest = all.values.take(30)
+        return newHomePageResponse(listOf(HomePageList("Latest Movies", latest)))
     }
 
-    private suspend fun fetchAllMovies(): List<Pair<String, SearchResponse>> {
+    private suspend fun fetchMovies(): Map<String, SearchResponse> {
         return try {
             val response = app.get(apiUrl, headers = headers).text
             val json = mapper.readValue<Map<String, Any>>(response)
-            val movies = json["data"] as? List<Map<String, Any>> ?: return emptyList()
+            val movies = json["data"] as? List<Map<String, Any>> ?: return emptyMap()
 
             movies.mapNotNull { movie ->
                 val id = movie["id"]?.toString() ?: return@mapNotNull null
@@ -78,53 +60,37 @@ class FmftpProvider : MainAPI() {
                 val genres = genreStr.split(",").map { it.trim() }.filter { it.isNotEmpty() }
                 val castsStr = movie["casts"] as? String ?: ""
                 val castList = castsStr.split(",").map { it.trim() }.filter { it.isNotEmpty() }
-                val library = (movie["Library"] as? Map<String, Any>)?.get("name") as? String ?: "Unknown"
                 val relativeUrl = movie["url"] as? String ?: ""
                 val streamUrl = "$mainUrl$relativeUrl"
                 val poster = ""
 
                 val detailUrl = "http://fmftp.local/$id"
                 movieStore[detailUrl] = MovieData(
-                    title, streamUrl, poster, "", plot, year, rating, genres, castList
+                    title, streamUrl, poster, plot, year, rating, genres, castList
                 )
-                libraryMap[detailUrl] = library
 
-                val searchResp = newMovieSearchResponse(
-                    title,        // name
-                    detailUrl,     // url
-                    TvType.Movie,  // type
-                    false          // isAd
-                ) {
+                val searchResp = newMovieSearchResponse(title, detailUrl, TvType.Movie, false) {
                     this.posterUrl = poster
                     this.year = year
                 }
-                Pair(detailUrl, searchResp)
-            }
+                detailUrl to searchResp
+            }.toMap()
         } catch (e: Exception) {
-            emptyList()
+            emptyMap()
         }
     }
 
     override suspend fun search(query: String): List<SearchResponse> {
-        val all = fetchAllMovies()
-        return all.mapNotNull { (_, resp) ->
-            if (resp.name?.contains(query, ignoreCase = true) == true) resp else null
-        }
+        val all = fetchMovies()
+        return all.values.filter { it.name?.contains(query, ignoreCase = true) == true }
     }
 
     override suspend fun load(url: String): LoadResponse {
         val movie = movieStore[url] ?: throw Error("Movie not found")
-        return newMovieLoadResponse(
-            name = movie.title,
-            url = url,
-            type = TvType.Movie,
-            data = movie.streamUrl
-        ) {
+        return newMovieLoadResponse(movie.title, url, TvType.Movie, movie.streamUrl) {
             this.plot = movie.plot
             this.year = movie.year
             this.posterUrl = movie.poster
-            this.backgroundPosterUrl = movie.backdrop
-            // score is optional; we skip to avoid type mismatch
             val tagsList = mutableListOf<String>()
             tagsList.addAll(movie.genres)
             if (movie.cast.isNotEmpty()) {

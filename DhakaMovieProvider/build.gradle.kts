@@ -13,6 +13,7 @@ cloudstream {
 }
 
 android {
+    namespace = "com.dhakamovie"
     buildFeatures {
         buildConfig = true
         viewBinding = true
