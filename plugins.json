@@ -18,5 +18,24 @@
         "description": "Stream movies from DhakaMovie BDIX",
         "url": "https://raw.githubusercontent.com/mpshimul/bdix-cloudstream-extensions/builds/DhakaMovieProvider.cs3",
         "name": "DhakaMovieProvider"
+    },
+    {
+        "fileHash": "sha256-59a4499c023ea464828e0885770b68456b7c5ba30b9719bff8f1c1f5827e638e",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/mpshimul/bdix-cloudstream-extensions",
+        "fileSize": 12884,
+        "status": 1,
+        "language": "bn",
+        "authors": [
+            "mpshimul"
+        ],
+        "tvTypes": [
+            "Movie"
+        ],
+        "version": 1,
+        "internalName": "fmftpprovider",
+        "description": "Movies from fmftp.net \u2013 Hollywood, Bollywood, Hindi Dubbed, Indian Bangla",
+        "url": "https://raw.githubusercontent.com/mpshimul/bdix-cloudstream-extensions/builds/fmftpprovider.cs3",
+        "name": "fmftpprovider"
     }
 ]
