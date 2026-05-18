@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive JB Enterprise Documents</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+        /* Print Settings Optimization */
+        @media print {
+            body {
+                background: none;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                padding: 0;
+            }
+            .page {
+                box-shadow: none !important;
+                margin: 0 !important;
+                page-break-after: always;
+            }
+            .no-print {
+                display: none !important;
+            }
+            /* Hide the visual indicator borders during print */
+            [contenteditable="true"] {
+                border-color: transparent !important;
+                outline: none !important;
+                background: transparent !important;
+            }
+        }
+
+        /* General Styling */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 40px 0;
+            color: #333;
+        }
+
+        /* Top Action Bar */
+        .no-print {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .print-btn {
+            background-color: #1a365d;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: background 0.2s;
+        }
+        .print-btn:hover {
+            background-color: #2b4c7e;
+        }
+
+        .page {
+            background: #ffffff;
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto 40px auto;
+            padding: 25mm 20mm 20mm 20mm;
+            box-sizing: border-box;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Highlight editable zones mildly for UI clarity */
+        [contenteditable="true"] {
+            transition: all 0.2s ease;
+            border-bottom: 1px dashed rgba(26, 54, 93, 0.2);
+            padding: 2px;
+        }
+        [contenteditable="true"]:hover {
+            background-color: #f7fafc;
+            border-bottom: 1px dashed #1a365d;
+        }
+        [contenteditable="true"]:focus {
+            outline: none;
+            background-color: #edf2f7;
+            border-bottom: 1px solid #1a365d;
+        }
+
+        /* Header / Pad Styles */
+        .header {
+            border-bottom: 3px double #1a365d;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .company-name {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1a365d;
+            letter-spacing: 1px;
+            margin: 0 0 5px 0;
+        }
+
+        .tagline {
+            font-size: 13px;
+            font-weight: 600;
+            color: #4a5568;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0 0 8px 0;
+        }
+
+        .company-info {
+            font-size: 11px;
+            color: #718096;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        /* Meta References (Ref, Date, License) */
+        .meta-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            font-size: 14px;
+        }
+
+        .meta-field {
+            display: flex;
+            align-items: flex-end;
+            width: 45%;
+        }
+
+        .meta-val {
+            flex-grow: 1;
+            margin-left: 8px;
+            min-width: 100px;
+        }
+
+        /* Document Title Section */
+        .doc-title-container {
+            text-align: center;
+            margin: 20px 0 30px 0;
+        }
+
+        .doc-title {
+            display: inline-block;
+            border: 2px solid #1a365d;
+            padding: 6px 30px;
+            font-weight: 700;
+            font-size: 18px;
+            color: #1a365d;
+            border-radius: 4px;
+            background-color: #f7fafc;
+        }
+
+        /* Challan Customer Info */
+        .customer-info {
+            margin-bottom: 30px;
+            font-size: 14px;
+            line-height: 2;
+        }
+
+        .customer-row {
+            display: flex;
+            margin-bottom: 10px;
+        }
+
+        .customer-label {
+            width: 100px;
+            font-weight: 600;
+        }
+
+        .customer-value {
+            flex-grow: 1;
+        }
+
+        /* Table Grid */
+        .content-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: auto; 
+        }
+
+        .content-table th, .content-table td {
+            border: 1px solid #cbd5e0;
+            padding: 10px;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .content-table th {
+            background-color: #f7fafc;
+            color: #1a365d;
+            font-weight: 600;
+        }
+
+        .th-sl { width: 8%; text-align: center; }
+        .th-desc { width: 62%; }
+        .th-qty { width: 12%; text-align: center; }
+        .th-remarks { width: 18%; }
+
+        /* Footer & Signatures */
+        .footer-signatures {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 60px;
+            padding-top: 20px;
+        }
+
+        .signature-block {
+            text-align: center;
+            width: 220px;
+        }
+
+        .signature-line {
+            border-top: 1px dashed #4a5568;
+            margin-bottom: 8px;
+        }
+
+        .signature-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .proprietor-info {
+            font-size: 12px;
+            color: #718096;
+            margin-top: 4px;
+        }
+
+        /* Letter Body Area Layout */
+        .letter-body-area {
+            flex-grow: 1;
+            padding: 10px 5px;
+            font-size: 15px;
+            line-height: 1.6;
+            color: #2d3748;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="no-print">
+        <button class="print-btn" onclick="window.print()">Print / Save as PDF</button>
+        <p style="color: #718096; font-size: 13px; margin-top: 8px;">Click directly on any text line or table row to edit details.</p>
+    </div>
+
+    <div class="page">
+        <div class="header">
+            <h1 class="company-name" contenteditable="true">JB ENTERPRISE</h1>
+            <p class="tagline" contenteditable="true">First Class Contractor, Importer, Exporter & Supplier</p>
+            <p class="company-info" contenteditable="true">
+                Office: 635, Medipath Vaban, Level 6(B), Great Wall City, Chandona Chowrasta, Gazipur-1700, Dhaka <br>
+                <strong>Trade License No:</strong> 163668
+            </p>
+        </div>
+
+        <div class="meta-row">
+            <div class="meta-field">Ref No: <div class="meta-val" contenteditable="true">JBE/2026/01</div></div>
+            <div class="meta-field">Date: <div class="meta-val" contenteditable="true">18-05-2026</div></div>
+        </div>
+
+        <div class="letter-body-area" contenteditable="true">
+            <p><strong>To,</strong><br>The Manager,<br>[Recipient Company Name]<br>Dhaka, Bangladesh.</p>
+            <p><strong>Subject: Official correspondence letter title goes here.</strong></p>
+            <p>Dear Sir,</p>
+            <p>Type your official application body, structural proposal details, or business communications here. The container expands naturally downwards if your letter requires additional content space.</p>
+            <p>Thank you for your continuous support.</p>
+            <p>Sincerely yours,</p>
+        </div>
+
+        <div class="footer-signatures" style="justify-content: flex-end;">
+            <div class="signature-block">
+                <div class="signature-line"></div>
+                <div class="signature-title" contenteditable="true">Proprietor: Fahim Reza</div>
+                <div class="proprietor-info" contenteditable="true">Commercial Supplier & Contractor</div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="page">
+        <div class="header">
+            <h1 class="company-name" contenteditable="true">JB ENTERPRISE</h1>
+            <p class="tagline" contenteditable="true">First Class Contractor, Importer, Exporter & Supplier</p>
+            <p class="company-info" contenteditable="true">
+                Office: 635, Medipath Vaban, Level 6(B), Great Wall City, Chandona Chowrasta, Gazipur-1700, Dhaka
+            </p>
+        </div>
+
+        <div class="meta-row" style="margin-bottom: 20px;">
+            <div class="meta-field">Challan No: <div class="meta-val" contenteditable="true">CH-4502</div></div>
+            <div class="meta-field">Date: <div class="meta-val" contenteditable="true">18-05-2026</div></div>
+        </div>
+
+        <div class="doc-title-container">
+            <div class="doc-title" contenteditable="true">CHALLAN / চালান</div>
+        </div>
+
+        <div class="customer-info">
+            <div class="customer-row">
+                <div class="customer-label">M/S:</div>
+                <div class="customer-value" contenteditable="true">ABC Trading Corporation Ltd.</div>
+            </div>
+            <div class="customer-row">
+                <div class="customer-label">Address:</div>
+                <div class="customer-value" contenteditable="true">Plot 12, Sector 3, Uttara, Dhaka</div>
+            </div>
+        </div>
+
+        <table class="content-table">
+            <thead>
+                <tr>
+                    <th class="th-sl">SL No.</th>
+                    <th class="th-desc">Description of Goods</th>
+                    <th class="th-qty">Quantity</th>
+                    <th class="th-remarks">Remarks</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="text-align: center;" contenteditable="true">1</td>
+                    <td contenteditable="true">Premium Quality Optical Fiber Cable (Core-4)</td>
+                    <td style="text-align: center;" contenteditable="true">5 Drums</td>
+                    <td contenteditable="true">Fresh Stock</td>
+                </tr>
+                <tr>
+                    <td style="text-align: center;" contenteditable="true">2</td>
+                    <td contenteditable="true">XPON ONU Devices Dual Band</td>
+                    <td style="text-align: center;" contenteditable="true">50 Pcs</td>
+                    <td contenteditable="true">Tested</td>
+                </tr>
+                <tr>
+                    <td style="text-align: center;" contenteditable="true">3</td>
+                    <td contenteditable="true"></td>
+                    <td style="text-align: center;" contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                </tr>
+                <tr>
+                    <td style="text-align: center;" contenteditable="true">4</td>
+                    <td contenteditable="true"></td>
+                    <td style="text-align: center;" contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                </tr>
+                <tr>
+                    <td style="text-align: center;" contenteditable="true">5</td>
+                    <td contenteditable="true"></td>
+                    <td style="text-align: center;" contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                </tr>
+                <tr>
+                    <td style="text-align: center;" contenteditable="true">6</td>
+                    <td contenteditable="true"></td>
+                    <td style="text-align: center;" contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="footer-signatures">
+            <div class="signature-block">
+                <div class="signature-line"></div>
+                <div class="signature-title" contenteditable="true">Recipient's Signature</div>
+            </div>
+            <div class="signature-block">
+                <div class="signature-line"></div>
+                <div class="signature-title" contenteditable="true">For JB ENTERPRISE</div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
